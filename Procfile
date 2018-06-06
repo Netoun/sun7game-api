@@ -1,0 +1,1 @@
+web: /target/release/sun7game-api
