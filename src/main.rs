@@ -25,7 +25,7 @@ pub struct Score {
 fn record_score(score: Json<Score>) -> &'static str {
     match env::var("MONGODB_URI") {
         Ok(uri) => {
-            let client = Client::connect(&uri, 27017)
+            let client = Client::connect(&uri, 47420)
                 .ok()
                 .expect("Error establishing connection.");
 
