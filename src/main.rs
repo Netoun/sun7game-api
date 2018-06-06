@@ -29,8 +29,7 @@ fn connect_db() -> mongodb::coll::Collection {
     ).ok()
         .expect("Error establishing connection.");
     let db = client.db("heroku_bgrz60xm");
-    db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
-        .unwrap();
+
     return db.collection("score");
 }
 
