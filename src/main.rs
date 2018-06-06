@@ -50,7 +50,7 @@ fn record_score(score: Json<Score>) -> &'static str {
 fn get_scores() -> Json<Value> {
     match env::var("MONGODB_URI") {
         Ok(uri) => {
-            let client = Client::connect("localhost", 27017)
+            let client = Client::connect(&uri, 27017)
                 .ok()
                 .expect("Error establishing connection.");
 
