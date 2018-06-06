@@ -53,7 +53,7 @@ fn get_scores() -> Json<Value> {
     let coll = connect_db();
     let mut cursor = coll.find(None, None).ok().expect("Failed to execute find.");
     let docs: Vec<_> = cursor.map(|doc| doc.unwrap()).collect();
-    Json(json!(docs));
+    return Json(json!(docs));
 }
 
 fn rocket() -> rocket::Rocket {
