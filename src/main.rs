@@ -24,7 +24,7 @@ pub struct Score {
 fn connect_db() -> mongodb::coll::Collection {
     let client = Client::connect(
         &env::var("MONGO_URL").unwrap(),
-        env::var("MONGO_URL").unwrap().parse::<u16>().unwrap(),
+        env::var("MONGO_PORT").unwrap().parse::<u16>().unwrap(),
     ).ok()
         .expect("Error establishing connection.");
     let db = client.db("game");
