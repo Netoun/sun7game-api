@@ -22,7 +22,7 @@ pub struct Score {
 }
 
 #[post("/", format = "application/json", data = "<score>")]
-fn record_score(score: Json<Score>) -> &'static str {
+fn record_score(score: Json<Score>) -> String {
     match env::var("MONGODB_URI") {
         Ok(uri) => {
             let client = Client::with_uri(&uri)
@@ -38,11 +38,11 @@ fn record_score(score: Json<Score>) -> &'static str {
                 "point": point
             };
             match coll.insert_one(doc, None) {
-                Ok(_) => "Done",
-                Err(e) => "Error",
+                Ok(_) => "Done".to_string(),
+                Err(e) => e.to_string(),
             }
         }
-        Err(e) => "Error mongo",
+        Err(e) => format!("error: {}", e),
     }
 }
 
@@ -60,7 +60,7 @@ fn get_scores() -> Json<Value> {
             let docs: Vec<_> = cursor.map(|doc| doc.unwrap()).collect();
             Json(json!(docs))
         }
-        Err(e) => Json(json!({ "error": "error" })),
+        Err(e) => Json(json!({ "error": format!("{}", e) })),
     }
 }
 
