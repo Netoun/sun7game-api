@@ -10,6 +10,7 @@ extern crate serde_derive;
 extern crate bson;
 extern crate mongodb;
 
+use mongodb::connstring::{parse, ConnectionString};
 use mongodb::db::ThreadedDatabase;
 use mongodb::{Client, ThreadedClient};
 use rocket_contrib::{Json, Value};
@@ -28,8 +29,7 @@ fn connect_db() -> mongodb::coll::Collection {
     ).ok()
         .expect("Error establishing connection.");
     let db = client.db("game");
-    db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
-        .unwrap();
+
     return db.collection("score");
 }
 
