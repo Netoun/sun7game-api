@@ -50,20 +50,10 @@ fn record_score(score: Json<Score>) -> String {
 
 #[get("/", format = "application/json")]
 fn get_scores() -> Json<Value> {
-    match env::var("MONGODB_URI") {
-        Ok(uri) => {
-            let client = Client::with_uri(&uri)
-                .ok()
-                .expect("Error establishing connection.");
-
-            // The users collection
-            let coll = client.db("game").collection("score");
-            let mut cursor = coll.find(None, None).ok().expect("Failed to execute find.");
-            let docs: Vec<_> = cursor.map(|doc| doc.unwrap()).collect();
-            Json(json!(docs))
-        }
-        Err(e) => Json(json!({ "error": format!("{}", e) })),
-    }
+    let coll = connect_db();
+    let mut cursor = coll.find(None, None).ok().expect("Failed to execute find.");
+    let docs: Vec<_> = cursor.map(|doc| doc.unwrap()).collect();
+    Json(json!(docs));
 }
 
 fn rocket() -> rocket::Rocket {
