@@ -21,28 +21,30 @@ pub struct Score {
     pub point: u32,
 }
 
+fn connect_db() -> mongodb::coll::Collection {
+    let client = Client::connect(
+        &env::var("MONGO_URL").unwrap(),
+        env::var("MONGO_URL").unwrap().parse::<u16>().unwrap(),
+    ).ok()
+        .expect("Error establishing connection.");
+    let db = client.db("game");
+    db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
+        .unwrap();
+    return db.collection("score");
+}
+
 #[post("/", format = "application/json", data = "<score>")]
 fn record_score(score: Json<Score>) -> String {
-    match env::var("MONGODB_URI") {
-        Ok(uri) => {
-            let client = Client::with_uri(&uri)
-                .ok()
-                .expect("Error establishing connection.");
-
-            // The users collection
-            let coll = client.db("game").collection("score");
-            let name = &score.name;
-            let point = score.point;
-            let doc = doc! {
-                "name": name,
-                "point": point
-            };
-            match coll.insert_one(doc, None) {
-                Ok(_) => "Done".to_string(),
-                Err(e) => e.to_string(),
-            }
-        }
-        Err(e) => format!("error: {}", e),
+    let coll = connect_db();
+    let name = &score.name;
+    let point = score.point;
+    let doc = doc! {
+        "name": name,
+        "point": point
+    };
+    match coll.insert_one(doc, None) {
+        Ok(_) => "Done".to_string(),
+        Err(e) => e.to_string(),
     }
 }
 
