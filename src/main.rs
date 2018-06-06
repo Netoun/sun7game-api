@@ -25,7 +25,7 @@ pub struct Score {
 fn record_score(score: Json<Score>) -> &'static str {
     match env::var("MONGODB_URI") {
         Ok(uri) => {
-            let client = Client::connect(&uri, 47420)
+            let client = Client::with_uri(&uri)
                 .ok()
                 .expect("Error establishing connection.");
 
@@ -50,7 +50,7 @@ fn record_score(score: Json<Score>) -> &'static str {
 fn get_scores() -> Json<Value> {
     match env::var("MONGODB_URI") {
         Ok(uri) => {
-            let client = Client::connect(&uri, 27017)
+            let client = Client::with_uri(&uri)
                 .ok()
                 .expect("Error establishing connection.");
 
