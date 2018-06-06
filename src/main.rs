@@ -28,8 +28,9 @@ fn connect_db() -> mongodb::coll::Collection {
         env::var("MONGO_PORT").unwrap().parse::<u16>().unwrap(),
     ).ok()
         .expect("Error establishing connection.");
-    let db = client.db("heroku_bgrz60xm");
-
+    let db = client.db("game");
+    db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
+        .unwrap();
     return db.collection("score");
 }
 
