@@ -12,14 +12,14 @@ extern crate bson;
 extern crate mongodb;
 
 use rocket::http::Method;
-use rocket_cors::{AllowedHeaders, AllowedOrigins};
+use rocket::response::Responder;
+use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors, Guard};
 
 use mongodb::db::ThreadedDatabase;
 use mongodb::{Client, CommandType, ThreadedClient};
 
 use rocket_contrib::{Json, Value};
 use std::env;
-use std::sync::Arc;
 
 #[derive(Serialize, Deserialize)]
 pub struct Score {
@@ -39,7 +39,7 @@ fn connect_db() -> mongodb::coll::Collection {
 }
 
 #[post("/", format = "application/json", data = "<score>")]
-fn record_score(score: Json<Score>) -> String {
+fn record_score<'a>(score: Json<Score>) -> String {
     let coll = connect_db();
     let name = &score.name;
     let point = score.point;
@@ -54,28 +54,38 @@ fn record_score(score: Json<Score>) -> String {
 }
 
 #[get("/", format = "application/json")]
-fn get_scores() -> Json<Value> {
+fn get_scores<'a>() -> Json<Value> {
     let coll = connect_db();
     let mut cursor = coll.find(None, None).ok().expect("Failed to execute find.");
     let docs: Vec<_> = cursor.map(|doc| doc.unwrap()).collect();
     return Json(json!(docs));
 }
 
-fn rocket() -> rocket::Rocket {
+#[options("/")]
+fn ping_options<'r>() -> impl Responder<'r> {
+    let options = cors_options_all();
+    options.respond_owned(|guard| guard.responder(()))
+}
+
+fn cors_options() -> Cors {
     let (allowed_origins, failed_origins) = AllowedOrigins::some(&["*"]);
+    assert!(failed_origins.is_empty());
 
     // You can also deserialize this
-    let options = rocket_cors::Cors {
+    rocket_cors::Cors {
         allowed_origins: allowed_origins,
-        allowed_methods: vec![Method::Get, Method::Post]
-            .into_iter()
-            .map(From::from)
-            .collect(),
         ..Default::default()
-    };
+    }
+}
 
+fn cors_options_all() -> Cors {
+    // You can also deserialize this
+    Default::default()
+}
+
+fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .attach(options)
+        .attach(cors_options())
         .mount("/score", routes![get_scores, record_score])
 }
 
