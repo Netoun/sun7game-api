@@ -33,13 +33,13 @@ fn connect_db() -> mongodb::coll::Collection {
         env::var("MONGO_PORT").unwrap().parse::<u16>().unwrap(),
     ).unwrap();
     let db = client.db(&env::var("USER").unwrap());
-    db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
-        .unwrap();
+
     return db.collection("score");
 }
 
 #[post("/", format = "application/json", data = "<score>")]
-fn record_score<'a>(score: Json<Score>) -> String {
+fn record_score(cors: Guard, score: Json<Score>) -> rocket_cors::Responder<&str> {
+    let options = cors_options_all();
     let coll = connect_db();
     let name = &score.name;
     let point = score.point;
@@ -48,8 +48,8 @@ fn record_score<'a>(score: Json<Score>) -> String {
         "point": point
     };
     match coll.insert_one(doc, None) {
-        Ok(_) => "Done".to_string(),
-        Err(e) => e.to_string(),
+        Ok(_) => cors.responder("Done"),
+        Err(e) => cors.responder("e"),
     }
 }
 
@@ -62,7 +62,7 @@ fn get_scores<'a>() -> Json<Value> {
 }
 
 #[options("/")]
-fn ping_options<'r>() -> impl Responder<'r> {
+fn get_scores_options<'r>() -> impl Responder<'r> {
     let options = cors_options_all();
     options.respond_owned(|guard| guard.responder(()))
 }
@@ -84,7 +84,10 @@ fn cors_options_all() -> Cors {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/score", routes![get_scores, record_score])
+        .mount(
+            "/score",
+            routes![get_scores, record_score, get_scores_options],
+        )
         .mount("/score", rocket_cors::catch_all_options_routes())
         .manage(cors_options())
 }
