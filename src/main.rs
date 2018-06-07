@@ -68,7 +68,7 @@ fn get_scores_options<'r>() -> impl Responder<'r> {
 }
 
 fn cors_options() -> Cors {
-    let (allowed_origins, failed_origins) = AllowedOrigins::some(&["*"]);
+    let (allowed_origins, failed_origins) = AllowedOrigins::some(&["http://sun7game.netlify.com/"]);
 
     // You can also deserialize this
     rocket_cors::Cors {
