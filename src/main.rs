@@ -58,7 +58,23 @@ fn get_scores() -> Json<Value> {
 }
 
 fn rocket() -> rocket::Rocket {
-    rocket::ignite().mount("/score", routes![get_scores, record_score])
+    let (allowed_origins, failed_origins) = AllowedOrigins::some(&["*"]);
+
+    // You can also deserialize this
+    let options = rocket_cors::Cors {
+        allowed_origins: allowed_origins,
+        allowed_methods: vec![Method::Get, Method::Post]
+            .into_iter()
+            .map(From::from)
+            .collect(),
+        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
+        allow_credentials: true,
+        ..Default::default()
+    };
+
+    rocket::ignite()
+        .attach(options)
+        .mount("/score", routes![get_scores, record_score])
 }
 
 fn main() {
