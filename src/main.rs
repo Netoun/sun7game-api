@@ -11,10 +11,9 @@ extern crate serde_derive;
 extern crate bson;
 extern crate mongodb;
 
-use rocket::fairing::{Fairing, Info, Kind};
-use rocket::http::{ContentType, Header, Method};
-use rocket::{Request, Response};
-use std::io::Cursor;
+use rocket::http::Method;
+use rocket_cors;
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 use mongodb::db::ThreadedDatabase;
 use mongodb::{Client, CommandType, ThreadedClient};
@@ -26,38 +25,6 @@ use std::env;
 pub struct Score {
     pub name: String,
     pub point: u32,
-}
-
-pub struct CORS();
-
-impl Fairing for CORS {
-    fn info(&self) -> Info {
-        Info {
-            name: "Add CORS headers to requests",
-            kind: Kind::Response,
-        }
-    }
-
-    fn on_response(&self, request: &Request, response: &mut Response) {
-        if request.method() == Method::Options || response.content_type() == Some(ContentType::JSON)
-        {
-            response.set_header(Header::new(
-                "Access-Control-Allow-Origin",
-                "https://sun7game.netlify.com/",
-            ));
-            response.set_header(Header::new(
-                "Access-Control-Allow-Methods",
-                "POST, GET, OPTIONS",
-            ));
-            response.set_header(Header::new("Access-Control-Allow-Headers", "Content-Type"));
-            response.set_header(Header::new("Access-Control-Allow-Credentials", "true"));
-        }
-
-        if request.method() == Method::Options {
-            response.set_header(ContentType::Plain);
-            response.set_sized_body(Cursor::new(""));
-        }
-    }
 }
 
 fn connect_db() -> mongodb::coll::Collection {
@@ -94,9 +61,19 @@ fn get_scores() -> Json<Value> {
     return Json(json!(docs));
 }
 
+pub fn options() -> rocket_cors::Cors {
+    rocket_cors::Cors {
+        allowed_origins: AllowedOrigins::all(),
+        allowed_methods: vec![Method::Post].into_iter().map(From::from).collect(),
+        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept", "Content-Type"]),
+        allow_credentials: true,
+        ..Default::default()
+    }
+}
+
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .attach(CORS())
+        .attach(options())
         .mount("/score", routes![get_scores, record_score])
 }
 
