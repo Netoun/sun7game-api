@@ -10,11 +10,12 @@ extern crate serde_derive;
 extern crate bson;
 extern crate mongodb;
 
-use mongodb::connstring::{parse, ConnectionString};
 use mongodb::db::ThreadedDatabase;
-use mongodb::{Client, ThreadedClient};
+use mongodb::{Client, CommandType, ThreadedClient};
+
 use rocket_contrib::{Json, Value};
 use std::env;
+use std::sync::Arc;
 
 #[derive(Serialize, Deserialize)]
 pub struct Score {
@@ -26,10 +27,10 @@ fn connect_db() -> mongodb::coll::Collection {
     let client = Client::connect(
         &env::var("MONGO_URL").unwrap(),
         env::var("MONGO_PORT").unwrap().parse::<u16>().unwrap(),
-    ).ok()
-        .expect("Error establishing connection.");
-    let db = client.db("heroku_bgrz60xm");
-
+    ).unwrap();
+    let db = client.db(&env::var("USER").unwrap());
+    db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
+        .unwrap();
     return db.collection("score");
 }
 
