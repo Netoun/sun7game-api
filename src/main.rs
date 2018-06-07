@@ -12,7 +12,6 @@ extern crate bson;
 extern crate mongodb;
 
 use rocket::http::Method;
-use rocket_cors;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 use mongodb::db::ThreadedDatabase;
