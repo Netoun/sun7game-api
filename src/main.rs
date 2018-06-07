@@ -61,7 +61,7 @@ fn get_scores<'a>() -> Json<Value> {
     return Json(json!(docs));
 }
 
-#[options("/")]
+#[options("/score")]
 fn get_scores_options<'r>() -> impl Responder<'r> {
     let options = cors_options_all();
     options.respond_owned(|guard| guard.responder(()))
