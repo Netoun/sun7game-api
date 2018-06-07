@@ -2,6 +2,7 @@
 #![plugin(rocket_codegen)]
 
 extern crate rocket;
+extern crate rocket_cors;
 #[macro_use]
 extern crate rocket_contrib;
 #[macro_use]
@@ -9,6 +10,9 @@ extern crate serde_derive;
 #[macro_use(bson, doc)]
 extern crate bson;
 extern crate mongodb;
+
+use rocket::http::Method;
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 use mongodb::db::ThreadedDatabase;
 use mongodb::{Client, CommandType, ThreadedClient};
