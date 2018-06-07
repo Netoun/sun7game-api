@@ -43,7 +43,7 @@ impl Fairing for CORS {
         {
             response.set_header(Header::new(
                 "Access-Control-Allow-Origin",
-                "http://localhost:9000",
+                "https://sun7game.netlify.com/",
             ));
             response.set_header(Header::new(
                 "Access-Control-Allow-Methods",
