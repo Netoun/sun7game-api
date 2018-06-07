@@ -85,8 +85,9 @@ fn cors_options_all() -> Cors {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .attach(cors_options())
         .mount("/score", routes![get_scores, record_score])
+        .mount("/score", rocket_cors::catch_all_options_routes())
+        .manage(cors_options())
 }
 
 fn main() {
