@@ -69,7 +69,6 @@ fn ping_options<'r>() -> impl Responder<'r> {
 
 fn cors_options() -> Cors {
     let (allowed_origins, failed_origins) = AllowedOrigins::some(&["*"]);
-    assert!(failed_origins.is_empty());
 
     // You can also deserialize this
     rocket_cors::Cors {
