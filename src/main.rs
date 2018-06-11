@@ -63,7 +63,7 @@ fn get_scores() -> Json<Value> {
 pub fn options() -> rocket_cors::Cors {
     rocket_cors::Cors {
         allowed_origins: AllowedOrigins::all(),
-        allowed_methods: vec![Method::Post, Method::GET]
+        allowed_methods: vec![Method::Post, Method::Get]
             .into_iter()
             .map(From::from)
             .collect(),
