@@ -6,7 +6,7 @@ authors = ["Netoun <coulonnier.nicolas.44@gmail.com>"]
 [dependencies]
 rocket = "0.3.6"
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master" }
-rocket_codegen = "0.3.6"
+rocket_codegen = "*"
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
