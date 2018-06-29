@@ -61,10 +61,8 @@ fn get_scores() -> Json<Value> {
 }
 
 pub fn options() -> rocket_cors::Cors {
-    let (allowed_origins, failed_origins) = AllowedOrigins::some(&["https://sun7game.netlify.com"]);
-
     rocket_cors::Cors {
-        allowed_origins: allowed_origins,
+        allowed_origins: AllowedOrigins::all(),
         allowed_methods: vec![Method::Post, Method::Get]
             .into_iter()
             .map(From::from)
