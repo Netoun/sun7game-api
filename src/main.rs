@@ -34,7 +34,7 @@ fn connect_db() -> mongodb::coll::Collection {
     let db = client.db(&env::var("USER").unwrap());
     db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
         .unwrap();
-    return db.collection("score");
+    let array = db.collection("score");
 }
 
 #[post("/", format = "application/json", data = "<score>")]
@@ -62,7 +62,7 @@ fn get_scores() -> Json<Value> {
 
 pub fn options() -> rocket_cors::Cors {
     rocket_cors::Cors {
-        allowed_origins: AllowedOrigins::all(),
+        allowed_origins: AllowedOrigins::some(&["https://sun7game.netlify.com/"]),
         allowed_methods: vec![Method::Post, Method::Get]
             .into_iter()
             .map(From::from)
