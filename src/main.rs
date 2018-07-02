@@ -34,7 +34,7 @@ fn connect_db() -> mongodb::coll::Collection {
     let db = client.db(&env::var("USER").unwrap());
     db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
         .unwrap();
-    let array = db.collection("score");
+    return db.collection("score");
 }
 
 #[post("/", format = "application/json", data = "<score>")]
