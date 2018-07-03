@@ -10,6 +10,8 @@ extern crate serde_derive;
 #[macro_use(bson, doc)]
 extern crate bson;
 extern crate mongodb;
+#[macro_use]
+extern crate log;
 
 use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
@@ -27,6 +29,7 @@ pub struct Score {
 }
 
 fn connect_db() -> mongodb::coll::Collection {
+    info!("connection start");
     let client = Client::connect(
         &env::var("MONGO_URL").unwrap(),
         env::var("MONGO_PORT").unwrap().parse::<u16>().unwrap(),
@@ -34,11 +37,13 @@ fn connect_db() -> mongodb::coll::Collection {
     let db = client.db(&env::var("USER").unwrap());
     db.auth(&env::var("USER").unwrap(), &env::var("PASSWORD").unwrap())
         .unwrap();
+    info!("db : {:?}", &env::var("MONGO_URL"));
     return db.collection("score");
 }
 
 #[post("/score", format = "application/json", data = "<score>")]
 fn record_score(score: Json<Score>) -> String {
+    info!("POST score");
     let coll = connect_db();
     let name = &score.name;
     let point = score.point;
@@ -54,6 +59,7 @@ fn record_score(score: Json<Score>) -> String {
 
 #[get("/score", format = "application/json")]
 fn get_scores() -> Json<Value> {
+    info!("GET score");
     let coll = connect_db();
     let mut cursor = coll.find(None, None).ok().expect("Failed to execute find.");
     let docs: Vec<_> = cursor.map(|doc| doc.unwrap()).collect();

@@ -603,6 +603,7 @@ name = "sun7game-api"
 version = "0.1.0"
 dependencies = [
  "bson 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "mongodb 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket 0.3.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "rocket_codegen 0.3.12 (registry+https://github.com/rust-lang/crates.io-index)",
