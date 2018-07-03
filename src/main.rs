@@ -37,7 +37,7 @@ fn connect_db() -> mongodb::coll::Collection {
     return db.collection("score");
 }
 
-#[post("/", format = "application/json", data = "<score>")]
+#[post("/score", format = "application/json", data = "<score>")]
 fn record_score(score: Json<Score>) -> String {
     let coll = connect_db();
     let name = &score.name;
@@ -52,12 +52,17 @@ fn record_score(score: Json<Score>) -> String {
     }
 }
 
-#[get("/", format = "application/json")]
+#[get("/score", format = "application/json")]
 fn get_scores() -> Json<Value> {
     let coll = connect_db();
     let mut cursor = coll.find(None, None).ok().expect("Failed to execute find.");
     let docs: Vec<_> = cursor.map(|doc| doc.unwrap()).collect();
     return Json(json!(docs));
+}
+
+#[get("/")]
+fn hello() -> &'static str {
+    "Hello, world!"
 }
 
 pub fn options() -> rocket_cors::Cors {
@@ -76,7 +81,7 @@ pub fn options() -> rocket_cors::Cors {
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
         .attach(options())
-        .mount("/score", routes![get_scores, record_score])
+        .mount("/", routes![hello, get_scores, record_score])
 }
 
 fn main() {
