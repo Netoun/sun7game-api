@@ -12,12 +12,13 @@ extern crate bson;
 extern crate mongodb;
 #[macro_use]
 extern crate log;
+extern crate pretty_env_logger;
 
 use rocket::http::Method;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 use mongodb::db::ThreadedDatabase;
-use mongodb::{Client, CommandType, ThreadedClient};
+use mongodb::{Client, ThreadedClient};
 
 use rocket_contrib::{Json, Value};
 use std::env;
@@ -61,7 +62,7 @@ fn record_score(score: Json<Score>) -> String {
 fn get_scores() -> Json<Value> {
     info!("GET score");
     let coll = connect_db();
-    let mut cursor = coll.find(None, None).ok().expect("Failed to execute find.");
+    let cursor = coll.find(None, None).ok().expect("Failed to execute find.");
     let docs: Vec<_> = cursor.map(|doc| doc.unwrap()).collect();
     return Json(json!(docs));
 }
