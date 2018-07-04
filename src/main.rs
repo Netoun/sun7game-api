@@ -91,5 +91,6 @@ fn rocket() -> rocket::Rocket {
 }
 
 fn main() {
+    pretty_env_logger::init();
     rocket().launch();
 }
