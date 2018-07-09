@@ -1,9 +1,10 @@
 pipeline {
   agent any
   stages {
-    stage('build') {
+    stage('First Step') {
       steps {
-        build 'cargo build --release'
+        echo 'Run CI Project'
+        sh 'git pull origin master'
       }
     }
   }
